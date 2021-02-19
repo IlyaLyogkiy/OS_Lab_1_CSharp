@@ -1,11 +1,36 @@
 ﻿using System;
 using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace HelloApp
 {
+  class Person
+  {
+    public string Name { get; set; }
+    public int Age { get; set; }
+  }
   class Program
   {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
+    {
+      string path = @"C:\SomeDir2";
+      // сохранение данных
+      using (FileStream fs = new FileStream($"{path}/user.json", FileMode.OpenOrCreate))
+      {
+        Person tom = new Person() { Name = "Tom", Age = 35 };
+        await JsonSerializer.SerializeAsync<Person>(fs, tom);
+        Console.WriteLine("Data has been saved to file");
+      }
+
+      // чтение данных
+      using (FileStream fs = new FileStream($"{path}/user.json", FileMode.OpenOrCreate))
+      {
+        Person restoredPerson = await JsonSerializer.DeserializeAsync<Person>(fs);
+        Console.WriteLine($"Name: {restoredPerson.Name}  Age: {restoredPerson.Age}");
+      }
+    }
+    static void Main1(string[] args)
     {
      Menu: Console.WriteLine("\nВведите пункт для выполнения:\n1.Вывод информации о дисках\n2.Работа с файлами\n3.Работа с форматом JSON\n0.Выход");
       string choise = Console.ReadLine();
@@ -64,7 +89,7 @@ namespace HelloApp
           Console.WriteLine("Файл был успешно удалён");
           break;
         case "3":
-          
+          Main();
           break;
         case "0":
           Environment.Exit(0);
